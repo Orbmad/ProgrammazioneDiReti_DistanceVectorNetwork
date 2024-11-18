@@ -1,3 +1,6 @@
+import sys
+import json
+
 class NetworkNode:
     def __init__(self, name, neighbors):
         """
@@ -58,14 +61,37 @@ class DistanceVectorNetwork:
             print(f"Nodo {name}: {node.distance_vector}")
 
 
-# Topologia della rete (modificabile)
-network_topology = {
-    'A': {'B': 1, 'D': 4},
-    'B': {'A': 1, 'C': 2},
-    'C': {'B': 2, 'D': 1},
-    'D': {'A': 4, 'C': 1}
-}
+def main():
+    # Topologia di default
+    default_topology = {
+        'A': {'B': 1, 'D': 4},
+        'B': {'A': 1, 'C': 2},
+        'C': {'B': 2, 'D': 1},
+        'D': {'A': 4, 'C': 1}
+    }
 
-# Creare la rete e simulare il protocollo di routing
-network = DistanceVectorNetwork(network_topology)
-network.simulate_routing()
+    # Controlla se sono stati passati parametri da riga di comando
+    if len(sys.argv) > 1:
+        try:
+            # Converti la stringa JSON passata da riga di comando in un dizionario
+            topology = json.loads(sys.argv[1])
+            print("Topologia personalizzata caricata:")
+        except json.JSONDecodeError:
+            print("Errore: Impossibile analizzare la topologia. Assicurati che sia in formato JSON valido.")
+            sys.exit(1)
+    else:
+        # Usa la topologia di default
+        topology = default_topology
+        print("Nessuna topologia specificata. Utilizzo della topologia di default:")
+
+    # Stampa la topologia caricata
+    for node, neighbors in topology.items():
+        print(f"{node}: {neighbors}")
+
+    # Crea la rete e simula il protocollo di routing
+    network = DistanceVectorNetwork(topology)
+    network.simulate_routing()
+
+
+if __name__ == "__main__":
+    main()

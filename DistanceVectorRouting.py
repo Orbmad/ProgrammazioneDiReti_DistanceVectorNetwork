@@ -68,8 +68,12 @@ def rand():
     return random.randint(1, 5)
 
 # Returns default topology
-def default_topology():
-    costs = [rand() for _ in range(10)]
+def default_topology(hop_count):
+    if hop_count:
+        costs = [1 for _ in range(10)]
+    else:
+        costs = [rand() for _ in range(10)]
+        
     return {
                 'A': {'B': costs[0], 'D': costs[1]},
                 'B': {'A': costs[0], 'C': costs[3], 'F': costs[4]},
@@ -82,6 +86,7 @@ def default_topology():
             }
 
 def main():
+    hop_count=True
     # Check if there are command line parameters.
     if len(sys.argv) > 1:
         try:
@@ -91,10 +96,10 @@ def main():
         except json.JSONDecodeError:
             print("Errore: Impossibile analizzare la topologia: assicurati che sia in formato JSON valido.\n"
                   "Caricamento topologia di default.")
-            topology = default_topology()
+            topology = default_topology(hop_count)
     else:
         # Use default topology.
-        topology = default_topology()
+        topology = default_topology(hop_count)
         print("Nessuna topologia specificata. Utilizzo della topologia di default:")
 
     # Print topology.

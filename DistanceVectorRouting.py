@@ -54,7 +54,7 @@ class Network:
                 print("\nConvergenza raggiunta!")
                 break
 
-        # Stampa finale delle tabelle di routing dopo la convergenza
+        # Final routes output.
         print("\nTabelle di routing finali dopo la convergenza:")
         self.print_distance_vectors()
 

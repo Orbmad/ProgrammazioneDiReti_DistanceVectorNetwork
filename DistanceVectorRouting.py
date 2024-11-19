@@ -56,19 +56,20 @@ class Network:
             
 # Generates a random cost between 1 and 5.
 def rand():
-    return random.randint(1, 6)
+    return random.randint(1, 5)
 
 # Returns default topology
 def default_topology():
+    costs = [rand() for _ in range(10)]
     return {
-                'A': {'B': rand(), 'D': rand(), 'F': rand()},
-                'B': {'A': rand(), 'C': rand(), 'F': rand()},
-                'C': {'A': rand(), 'B': rand(), 'D': rand(), 'F': rand(), 'G': rand()},
-                'D': {'C': rand(), 'E': rand(), 'G': rand()},
-                'E': {'D': rand(), 'F': rand(), 'H': rand()},
-                'F': {'A': rand(), 'B': rand(), 'C': rand(), 'E': rand()},
-                'G': {'C': rand(), 'D': rand()},
-                'H': {'E': rand()}
+                'A': {'B': costs[0], 'D': costs[1]},
+                'B': {'A': costs[0], 'C': costs[3], 'F': costs[4]},
+                'C': {'B': costs[3], 'D': costs[5], 'F': costs[6], 'G': costs[7]},
+                'D': {'A': costs[1], 'C': costs[5], 'E': costs[8], 'G': costs[9]},
+                'E': {'D': costs[8], 'H': costs[2]},
+                'F': {'B': costs[4], 'C': costs[6]},
+                'G': {'C': costs[7], 'D': costs[9]},
+                'H': {'E': costs[2]}
             }
 
 def main():

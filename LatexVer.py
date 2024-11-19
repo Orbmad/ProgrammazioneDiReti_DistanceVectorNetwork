@@ -6,11 +6,11 @@ class NetworkNode:
     def __init__(self, name, neighbors):
         self.name = name
         self.neighbors = neighbors
-        self.distance_vector = {name: 0}  # Initialize the DistanceVector with self distance.
-        self.next_hop = {name: None}  # Initialize the next hop table with None.
+        self.distance_vector = {name: 0}
+        self.next_hop = {name: None}
         for neighbor, cost in neighbors.items():
-            self.distance_vector[neighbor] = cost  # Initialize starting distances with neighbors.
-            self.next_hop[neighbor] = neighbor  # Neighbor is the next hop for directly connected nodes.
+            self.distance_vector[neighbor] = cost
+            self.next_hop[neighbor] = neighbor
 
     def update_distance_vector(self, network_nodes):
         updated = False
@@ -24,7 +24,7 @@ class NetworkNode:
                 new_cost = self.neighbors[neighbor] + cost
                 if dest not in self.distance_vector or new_cost < self.distance_vector[dest]:
                     self.distance_vector[dest] = new_cost
-                    self.next_hop[dest] = neighbor  # Update next hop for this destination.
+                    self.next_hop[dest] = neighbor
                     updated = True
         return updated
 
@@ -38,7 +38,6 @@ class Network:
         print(f"Iterazione {iteration}: Stato iniziale")
         self.print_distance_vectors()
 
-        # Continue until Distance Vectors stop updating.
         while True:
             updated = False
             iteration += 1
@@ -49,11 +48,10 @@ class Network:
             print(f"\nIterazione {iteration}: Aggiornamento")
             self.print_distance_vectors()
 
-            if not updated:  # If no Distance Vector is updated, convergence is reached.
+            if not updated:
                 print("\nConvergenza raggiunta!")
                 break
 
-        # Stampa finale delle tabelle di routing dopo la convergenza
         print("\nTabelle di routing finali dopo la convergenza:")
         self.print_distance_vectors()
 
@@ -63,11 +61,9 @@ class Network:
             print(f"  Distance Vector: {node.distance_vector}")
             print(f"  Next Hop: {node.next_hop}")
 
-# Generates a random cost between 1 and 5.
 def rand():
     return random.randint(1, 5)
 
-# Returns default topology
 def default_topology(hop_count):
     if hop_count:
         costs = [1 for _ in range(10)]
@@ -87,39 +83,28 @@ def default_topology(hop_count):
 
 def main():
     hop_count=True
-    # Check if there are command line parameters.
     if len(sys.argv) > 1:
-        if sys.argv[1] == '0':
-            hop_count=False
-            # Use default topology.
+        try:
+            topology = json.loads(sys.argv[1])
+            print("Topologia personalizzata caricata:")
+        except json.JSONDecodeError:
+            print("Errore: Impossibile analizzare la topologia: assicurati che sia in formato JSON valido.\n"
+                  "Caricamento topologia di default.")
             topology = default_topology(hop_count)
-            print("Nessuna topologia specificata. Utilizzo della topologia di default:")
-        else:
-            try:
-                # Convert JSON string in a dictionary.
-                topology = json.loads(sys.argv[1])
-                print("Topologia personalizzata caricata:")
-            except json.JSONDecodeError:
-                print("Errore: Impossibile analizzare la topologia: assicurarsi che sia in formato JSON valido.\n"
-                    "Caricamento topologia di default.")
-                topology = default_topology(hop_count)
     else:
         # Use default topology.
         topology = default_topology(hop_count)
         print("Nessuna topologia specificata. Utilizzo della topologia di default:")
 
     # Print topology.
-    try:
-        for node, neighbors in topology.items():
-            print(f"{node}: {neighbors}")
-        print("\n")
-    except (AttributeError, UnboundLocalError):
-        print("Errore: La topologia caricata non è valida. Terminazione forzata")
-        sys.exit(1)
+    for node, neighbors in topology.items():
+        print(f"{node}: {neighbors}")
+    print("\n")
 
     # Creates the network and simulates routing protocol.
     network = Network(topology)
     network.simulate_routing()
+
 
 if __name__ == "__main__":
     main()

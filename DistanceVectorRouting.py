@@ -7,8 +7,10 @@ class NetworkNode:
         self.name = name
         self.neighbors = neighbors
         self.distance_vector = {name: 0}  # Initialize the DistanceVector with self distance.
+        self.next_hop = {name: None}  # Initialize the next hop table with None.
         for neighbor, cost in neighbors.items():
             self.distance_vector[neighbor] = cost  # Initialize starting distances with neighbors.
+            self.next_hop[neighbor] = neighbor  # Neighbor is the next hop for directly connected nodes.
 
     def update_distance_vector(self, network_nodes):
         updated = False
@@ -22,6 +24,7 @@ class NetworkNode:
                 new_cost = self.neighbors[neighbor] + cost
                 if dest not in self.distance_vector or new_cost < self.distance_vector[dest]:
                     self.distance_vector[dest] = new_cost
+                    self.next_hop[dest] = neighbor  # Update next hop for this destination.
                     updated = True
         return updated
 
@@ -46,14 +49,20 @@ class Network:
             print(f"\nIterazione {iteration}: Aggiornamento")
             self.print_distance_vectors()
 
-            if not updated:  # If no Distance Vector is uptated convergence is reached.
+            if not updated:  # If no Distance Vector is updated, convergence is reached.
                 print("\nConvergenza raggiunta!")
                 break
 
+        # Stampa finale delle tabelle di routing dopo la convergenza
+        print("\nTabelle di routing finali dopo la convergenza:")
+        self.print_distance_vectors()
+
     def print_distance_vectors(self):
         for name, node in self.nodes.items():
-            print(f"Nodo {name}: {node.distance_vector}")
-            
+            print(f"Nodo {name}:")
+            print(f"  Distance Vector: {node.distance_vector}")
+            print(f"  Next Hop: {node.next_hop}")
+
 # Generates a random cost between 1 and 5.
 def rand():
     return random.randint(1, 5)

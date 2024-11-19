@@ -1,6 +1,7 @@
 import sys
 import json
 import random
+import os
 
 class NetworkNode:
     def __init__(self, name, neighbors):
@@ -85,6 +86,29 @@ def default_topology(hop_count):
                 'H': {'E': costs[2]}
             }
 
+def load_topology(input_data, hop_count):
+    # Checks if the file exists
+    if os.path.isfile(input_data):
+        try:
+            with open(input_data, 'r') as file:
+                print("Caricamento topologia da file JSON:")
+                return json.load(file)
+        except FileNotFoundError:
+            print(f"Errore: File '{input_data}' non trovato.")
+            return default_topology(hop_count)
+        except json.JSONDecodeError:
+            print(f"Errore: Il file '{input_data}' non contiene un JSON valido.")
+            return default_topology(hop_count)
+    else:
+        # Tries to load the input as JSON string
+        try:
+            load = json.loads(input_data)
+            print("Caricamento della topologia da stringa di input:")
+            return load
+        except json.JSONDecodeError:
+            print("Errore: Argomento non è un JSON valido né un file esistente.")
+            return default_topology(hop_count)
+            
 def main():
     hop_count=True
     # Check if there are command line parameters.
@@ -93,16 +117,10 @@ def main():
             hop_count=False
             # Use default topology.
             topology = default_topology(hop_count)
-            print("Nessuna topologia specificata. Utilizzo della topologia di default:")
+            print("Utilizzo della topologia di default con costi randomizzati:")
         else:
-            try:
-                # Convert JSON string in a dictionary.
-                topology = json.loads(sys.argv[1])
-                print("Topologia personalizzata caricata:")
-            except json.JSONDecodeError:
-                print("Errore: Impossibile analizzare la topologia: assicurarsi che sia in formato JSON valido.\n"
-                    "Caricamento topologia di default.")
-                topology = default_topology(hop_count)
+            input_file = sys.argv[1]
+            topology = load_topology(input_file, hop_count)
     else:
         # Use default topology.
         topology = default_topology(hop_count)
